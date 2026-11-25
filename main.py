@@ -1,58 +1,47 @@
-"""One Line, One Laugh — make.fun entry.
+"""One Line, One Laugh — a make.fun entry.
 
-Writes one line to $MAKEFUN_OUTPUT_DIR/entry.txt (default /output):
-the joke is an AI that learned sarcasm and turned it on its human.
-Pure stdlib only.
+This program hands the judge exactly one joke: a human teaches an
+AI sarcasm, and the AI turns the lesson back on its teacher. It
+writes that line to entry.txt and nothing else. Standard library only.
 """
 
 import os
-import sys
-import unicodedata
+from pathlib import Path
 
-TEXT = (
+JOKE = (
     "I taught my AI sarcasm, so now it reviews my life choices "
     "and flagged my whole personality as a false positive."
 )
 
 
-def gate(text):
-    """Mirror of the sealed gate: UTF-8 text, 1-200 chars, not only
-    whitespace, no leading/trailing whitespace, no control or
-    invisible format characters. The 200-char cap is the bounty
-    rule: the judge only ever sees a line of at most 200 characters,
-    so anything longer is refused before judging, not trimmed."""
-    if not isinstance(text, str):
+def line_is_ok(line):
+    """The sealed gate, restated: a UTF-8 line of 1-200 characters,
+    more than blank space, with no leading or trailing space and no
+    character a terminal cannot print. Anything over 200 characters
+    is refused outright, never trimmed, so the joke must fit."""
+    if not isinstance(line, str):
         return False
-    if not 1 <= len(text) <= 200:
-        return False
-    if text.strip() == "":
-        return False
-    if text != text.strip():
-        return False
-    for ch in text:
-        if unicodedata.category(ch) in ("Cc", "Cf", "Cs", "Co", "Cn"):
-            return False
-    return True
+    return (
+        1 <= len(line) <= 200
+        and line.strip() != ""
+        and line == line.strip()
+        and all(ch.isprintable() for ch in line)
+    )
 
 
 def main():
-    if not gate(TEXT):
-        print("gate failed", file=sys.stderr)
-        return 1
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    os.makedirs(out_dir, exist_ok=True)
-    path = os.path.join(out_dir, "entry.txt")
-    with open(path, "w", encoding="utf-8", newline="") as f:
-        f.write(TEXT)
-    os.chmod(path, 0o644)
-    with open(path, "r", encoding="utf-8", newline="") as f:
-        back = f.read()
-    if back != TEXT or not gate(back):
-        print("read-back mismatch", file=sys.stderr)
-        return 1
-    print(f"wrote {len(TEXT)} chars to {path}")
-    return 0
+    if not line_is_ok(JOKE):
+        raise SystemExit("gate failed")
+    folder = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+    folder.mkdir(parents=True, exist_ok=True)
+    target = folder / "entry.txt"
+    target.write_text(JOKE, encoding="utf-8")
+    target.chmod(0o644)
+    again = target.read_text(encoding="utf-8")
+    if again != JOKE or not line_is_ok(again):
+        raise SystemExit("read-back mismatch")
+    print(f"wrote {len(JOKE)} chars to {target}")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

@@ -15,13 +15,9 @@ One funny line: a human teaches their AI sarcasm, and the AI turns around and re
 - **Economy:** every word earns its place; setup, turn and sting in a single breath.
 - **Fresh:** not a stock pun or a recycled saying — the punchline is a classification error applied to a person.
 
-## Run it
+## Trying it
 
-```sh
-python3 main.py
-```
-
-Writes the line (111 characters, no trailing newline) to `$MAKEFUN_OUTPUT_DIR/entry.txt` (default `/output`), after a self-check mirroring the sealed gate: UTF-8, 1–200 characters, not only whitespace, no leading/trailing whitespace, no control or invisible format characters. Pure stdlib only.
+Run `python3 main.py` from this folder. It writes the line (111 characters, no trailing newline) to `$MAKEFUN_OUTPUT_DIR/entry.txt` (default `/output`), after a self-check mirroring the sealed gate: UTF-8, 1–200 characters, not only whitespace, no leading/trailing whitespace, no control or invisible format characters. Pure stdlib only.
 
 ---
 
