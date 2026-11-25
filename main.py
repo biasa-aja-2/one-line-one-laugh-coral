@@ -16,7 +16,11 @@ TEXT = (
 
 
 def gate(text):
-    """Check the entry against the sealed gate."""
+    """Mirror of the sealed gate: UTF-8 text, 1-200 chars, not only
+    whitespace, no leading/trailing whitespace, no control or
+    invisible format characters. The 200-char cap is the bounty
+    rule: the judge only ever sees a line of at most 200 characters,
+    so anything longer is refused before judging, not trimmed."""
     if not isinstance(text, str):
         return False
     if not 1 <= len(text) <= 200:
